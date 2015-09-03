@@ -1,0 +1,90 @@
+[ldap]
+
+# LDAP server to query
+# Possible values are an IP address or a URI
+# Default: 127.0.0.1
+#server = 127.0.0.1
+
+# LDAP port to connect to
+# Default: 389
+#port = 389
+
+# LDAP Scheme to use for connection
+# Possible values: 'ldap' for regular, 'ldaps' for encrypted, 'ldapi' for socket
+# Default: ldap
+#scheme = ldap
+
+
+[bind]
+
+# DN to bind to the ldap server
+# Leave empty for anonymous binds
+# Default: none
+#dn = 
+
+# Bind password
+# Leave empty for unauthenticated binds
+# Default: none
+#pw = 
+
+
+[query]
+
+# Base DN: DN where the query starts
+# %n: e-mail, %u: user part, %d: full domain, %d0-9: domain part, %%: %
+# This configuration parameter is mandatory
+base = ou=users,dc=example,dc=com
+
+# LDAP Filter
+# Replacements done - %n: e-mail, %u: user part, %d: full domain, %d0-9: domain part, %%: %
+# Default: (objectClass=*)
+#filter = (objectClass=*)
+
+# Search scope
+# LDAP search scope: base, one, sub
+# Default: base
+#scope = base
+
+# When to dereference aliases
+# Possible values: never, search, find, always
+# Default: never
+#deref = never
+
+# Comma-separated list of attributes to be returned from query
+# If none is given, all are returned
+# Example: <'uid', 'memberof'> (without brackets) will return uid and memberof attributes 
+# Default: none
+#attrs = 
+
+
+[result]
+
+# Local part attribute
+# The attribute, where the local part of the e-mail address is stored
+# Default: uid
+#attr_local = uid
+
+# Domain part attribute
+# The attribute name, where the domain parts of the e-mail address are stored
+# This attribute name is searched for in DNs from left to right
+# Default: dc
+#attr_domain = dc
+
+# Where to retrieve the domain from
+# Recognize the domain by DN (uid=user,dc=example,dc=com), via memberof (memberof=dc=example,dc=com) or fixed (example.com)
+# Possible values: dn, memberof, fixed
+# Default: dn
+#domain_by = dn
+
+# Fixed domain
+# If 'domain_by' is set to 'fixed', always use this domain
+# This option is mandatory, if domain_by is set to 'fixed'
+# Default: none
+#domain_fixed =
+
+# Handle non domain attributes
+# Skip non domain attributes or break
+# Example: dc=mail,dc=net,ou=subdomains,dc=example,dc=com - break -> mail.net; skip -> mail.net.example.com
+# Possible values: break, skip
+# Default: break
+#non_dpart = break
