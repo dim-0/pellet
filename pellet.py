@@ -122,14 +122,6 @@ def adjust(inp, sender, user, dom, dom_p):
 
 # Search LDAP
 def ldap_search(uri, bind_dn, bind_pw, base, ldap_filter, scope, deref, attrs):
-	print uri
-	print bind_dn
-	print bind_pw
-	print base
-	print ldap_filter
-	print scope
-	print deref
-	print attrs
 
 	lc = ldap.initialize(uri)
 
