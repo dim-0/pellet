@@ -88,3 +88,17 @@ base = ou=users,dc=example,dc=com
 # Possible values: break, skip
 # Default: break
 #non_dpart = break
+
+
+[alias]
+
+# Retrieve aliased objects
+# If the result set contains aliases, get the aliased objects in extra queries
+# Possible values: on, off
+# Default: off
+#get_aliased = off
+
+# Alias LDAP filter
+# When searching for aliased objects, use this filter for the results
+# Default: (objectClass=*)
+#alias_filter = (objectClass=*)
