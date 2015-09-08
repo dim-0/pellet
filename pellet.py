@@ -1,19 +1,14 @@
 #!/usr/bin/env python
 # 
-# pellet.py - TCP lookup table for Postfix smtpd_sender_maps 
-#
-# This python script will act as a tcp lookup table for postfix
-# in order to provide enhanced LDAP support
+# pellet.py - Postfix Enhanced LDAP Lookup E-Mail Translator
+# This python script acts as a TCP lookup table for postfix
+# and returns the base account for a given sender
 #
 # To integrate with postfix add following lines
-#
 # - to master.cf:
-#
 #  127.0.0.1:<port> inet  n       n       n       -       0      spawn
 #    user=<user> argv=/path/to/pellet.py
-#
 # - to main.cf:
-#
 #  smtpd_sender_login_maps = tcp:[127.0.0.1]:<port>
 #  127.0.0.1:<port>_time_limit = 3600s
 
@@ -21,7 +16,7 @@ import sys, os, configparser, ldap, re
 
 
 ### Constants
-CONFIG_FILE = './pellet.conf'
+CONFIG_FILE = 'POSTFIX_ETC_DIR/pellet.conf'
 MAX_RESP_LEN = 4091 # Max. response length = 4096 - 3 (return code) - 1 (space) - 1 (new line)
 
 RCODES = [200, 400, 500]
@@ -46,7 +41,7 @@ def output(rc, msg):
 def format_result(inp):
 	result = ''
 	for addr in inp:
-		if len(result) == 0:
+		if not result:
 			result = addr
 		else:
 			result = result + ' ' + addr
@@ -238,7 +233,6 @@ def read_config():
 def initialize():
 	# Auto-flush the output stream
 	sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
-
 	read_config()
 
 
@@ -250,14 +244,19 @@ while True:
 		sender = parse(raw_input())
 
 		if not re.match(r'[^@]+@[^@]+\.[^@]+', sender):
-			output(500, 'Not a valid e-mail address')
+			output(500, sender + ' is not a valid e-mail address')
 		else:
 			result = get_sasls(sender)
 
 			if result:
 				output(200, format_result(result))
 			else:
-				output(500, 'Could not match address')
+				output(500, 'Could not match address ' + sender)
 	except Exception as exc:
-		msg = exc.args
-		print('400 Error: ' + str(msg[0]) + ' ' + str(msg[1]))
+		args = exc.args
+		for arg in args:
+			if not msg:
+				msg = str(arg)
+			else:
+				msg = msg + '; ' + str(arg)
+		print('400 Error: ' + msg)
