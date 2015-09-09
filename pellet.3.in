@@ -42,13 +42,13 @@ pellet now enables you to not only resolve the correct e-mail address, but can a
 In order to make pellet work, you need to make sure, postfix will spawn pellet as a sub-process on start-up.
 .P
 Therefore enter in your postfix' master.cf file the following line:
-.PH
+.P
 127.0.0.1:PELLET_PORT inet  n       n       n       -       0      spawn   user=PELLET_USER argv=PELLET_LIB_DIR/pellet.py
 
 Afterwards you can add this tcp lookup table to different maps in your main.cf file. Just add these lines (for example to smtpd_sender_login_maps):
-.PH
+.P
 smtpd_sender_login_maps = tcp:127.0.0.1:PELLET_PORT
-.PH
+.P
 127.0.0.1:PELLET_PORT_time_limit = 3600s
 .P
 Once started, pellet will look for the configuration file PELLET_ETC_DIR/pellet.conf
@@ -221,5 +221,4 @@ By default pellet runs on port PELLET_PORT. However, you can of course bind it t
 Also you can relocate the script file PELLET_LIB_DIR/pellet.py to any other place, just change the corresponding path in postfix' master.cf
 
 .SH SEE ALSO
-.BR postfix (1)
-.BR tcp_table (5)
+.BR postfix (1), tcp_table (5)
