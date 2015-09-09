@@ -50,6 +50,11 @@ Therefore enter in your postfix' master.cf file the following line:
 127.0.0.1:PELLET_PORT inet  n       n       n       -       0      spawn
     user=PELLET_USER argv=PELLET_LIB_DIR/pellet.py
 
+Afterwards you can add this tcp lookup table to different maps in your main.cf
+file. Just add these lines (for example to smtpd_sender_login_maps):
+smtpd_sender_login_maps = tcp:127.0.0.1:PELLET_PORT
+127.0.0.1:PELLET_PORT_time_limit = 3600s
+
 Once started, pellet will look for the configuration file
 PELLET_ETC_DIR/pellet.conf
 You can just copy pellet.conf.dist and change the configuration options.
@@ -185,6 +190,13 @@ query, but when it comes to alias resolution, you might only want
 back results with an explicit object class. Use this option for
 such a purpose.
 Default: (objectClass=*)
+
+.SH OPTIONS
+By default pellet runs on port PELLET_PORT. However, you can of course
+bind it to another port by just changing the lines in postfix' master.cf
+and main.cf files.
+Also you can relocate the script file PELLET_LIB_DIR/pellet.py to any
+other place, just change the corresponding path in postfix' master.cf
 
 .SH SEE ALSO
 .BR postfix (1)
