@@ -45,7 +45,7 @@ CONFIG_TARGET = pellet.conf.dist
 
 all: build
 
-build: ${SCRIPT_TARGET} ${MAN3PAGES} {CONFIG_TARGET}
+build: ${SCRIPT_TARGET} ${MAN3PAGES_TARGET} ${CONFIG_TARGET}
 
 ${SCRIPT_TARGET}: ${SCRIPT}
 	sed -e 's:PELLET_ETC_DIR:${PELLET_ETC_DIR}:g' \
@@ -55,7 +55,7 @@ ${SCRIPT_TARGET}: ${SCRIPT}
 		-e 's:MAN3DIR:${MAN3DIR}:g' \
 	$< > $@
 
-%.3 : %.3.in
+${MAN3PAGES_TARGET}: ${MAN3PAGES}
 	sed -e 's:PELLET_ETC_DIR:${PELLET_ETC_DIR}:g' \
 	  -e 's:PELLET_LIB_DIR:${PELLET_LIB_DIR}:g' \
 	  -e 's:PELLET_USER:${PELLET_USER}:g' \

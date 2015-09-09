@@ -24,179 +24,201 @@ pellet \- Postfix Enhanced LDAP Lookup E-mail Translator
 
 .SH DESCRIPTION
 pellet is a small python script, which acts as a tcp lookup table for postfix.
-It was developed for using LDAP lookups (with smtpd_sender_login_maps) without
-the need to have full e-mail addresses in attributes.
+It was developed for using LDAP lookups (with smtpd_sender_login_maps) without the need to have full e-mail addresses in attributes.
 
-What pellet actually does, is taking a request ('get <sender address>') and
-querying for associated LDAP entries.
-Depending on your configuration it then tries to combine attributes returned
-by the LDAP query in order to receive the original login e-mail addresses.
+What pellet actually does, is taking a request ('get <sender address>') and querying for associated LDAP entries.
+Depending on your configuration it then tries to combine attributes returned by the LDAP query in order to receive the original login e-mail addresses.
 These are returned to postfix.
 
-As an example, imagine you have a sender like 'user@example.net', but you don't
-have this address in your LDAP tree, but rather something like
+As an example, imagine you have a sender like 'user@example.net', but you don't have this address in your LDAP tree, but rather something like
+.P
 uid=user,dc=example,dc=net,ou=domains,dc=example,dc=com
-If this user would be logged in as 'user@example.net', the regular LDAP table
-lookups could only return 'user', which could not be mapped by the sender
-restrictions.
-pellet now enables you to not only resolve the correct e-mail address, but can
-also handle aliases (like having the logged in user 'user@example.net' sending
-a message as 'webmaster@example.com')!
+.P
+If this user would be logged in as 'user@example.net', the regular LDAP table lookups could only return 'user', which could not be mapped by the sender restrictions.
+.P
+pellet now enables you to not only resolve the correct e-mail address, but can also handle aliases (like having the logged in user 'user@example.net' sending a message as 'webmaster@example.com')!
 
 .SH CONFIGURATION
-In order to make pellet work, you need to make sure, postfix will spawn pellet
-as a sub-process on start-up.
+In order to make pellet work, you need to make sure, postfix will spawn pellet as a sub-process on start-up.
+.P
 Therefore enter in your postfix' master.cf file the following line:
-127.0.0.1:PELLET_PORT inet  n       n       n       -       0      spawn
-    user=PELLET_USER argv=PELLET_LIB_DIR/pellet.py
+.PH
+127.0.0.1:PELLET_PORT inet  n       n       n       -       0      spawn   user=PELLET_USER argv=PELLET_LIB_DIR/pellet.py
 
-Afterwards you can add this tcp lookup table to different maps in your main.cf
-file. Just add these lines (for example to smtpd_sender_login_maps):
+Afterwards you can add this tcp lookup table to different maps in your main.cf file. Just add these lines (for example to smtpd_sender_login_maps):
+.PH
 smtpd_sender_login_maps = tcp:127.0.0.1:PELLET_PORT
+.PH
 127.0.0.1:PELLET_PORT_time_limit = 3600s
-
-Once started, pellet will look for the configuration file
-PELLET_ETC_DIR/pellet.conf
+.P
+Once started, pellet will look for the configuration file PELLET_ETC_DIR/pellet.conf
+.P
 You can just copy pellet.conf.dist and change the configuration options.
+.P
 Following configuration options are available:
 
 .SS [ldap] server
 This configuration option determines the LDAP server, where the queries go to.
+.P
 Enter your server either per URI (e.g. ldap.example.net) or its IP address.
+.P
 Default: 127.0.0.1
 
 .SS [ldap] port
 Here you can set the port to connect to when connecting to the LDAP server.
+.P
 Default: 389
 
 .SS [ldap] scheme
 Set the scheme to be used for LDAP connections.
-You can use regular 'ldap', encrypted 'ldaps' (remember to check certificates)
-or 'ldapi' when connecting via socket.
+.P
+You can use regular 'ldap', encrypted 'ldaps' (remember to check certificates) or 'ldapi' when connecting via socket.
+.P
 Possible values: ldap, ldaps, ldapi
+.P
 Default: ldap
 
 .SS [bind] dn
 Here you can set the DN to use for binds.
+.P
 If no DN is given, pellet will try to use an anonymous connection.
+.P
 Default: none
 
 .SS [bind] pw
 If you need to authenticate while binding to the bind DN, use this password.
+.P
 If you configured unauthenticated binds, you can just leave it empty.
+.P
 Default: none
 
 .SS [query] base
 This is the base DN for your LDAP queries. Set it to the part of the DIT
+.P
 where you want to start your search.
+.P
 You can use placeholders in your base DN:
+.P
 %u will be replaced by the user part of the sender address
+.P
 %n will be replaced by the whole sender address
+.P
 %d will be replaced by the domain part of the sender address
+.P
 %d1 (and %d2..%d9 respectively) will be replaced by the single domain parts
+.P
 %% will be replaced by %
-Example user@example.com: %u = 'user'; %n = 'user@example.com';
-%d = 'example.com'; %d1 = 'example'; %d2 = 'com'
+.P
+Example user@example.com: %u = 'user'; %n = 'user@example.com'; %d = 'example.com'; %d1 = 'example'; %d2 = 'com'
+.P
 This option is mandatory!
 
 .SS [query] filter
 This option lets you define a standard LDAP filter for your queries.
+.P
 The same placeholders as with the base DN are available.
+.P
 Default: (objectClass=*)
 
 .SS [query] scope
 You can set the search scope for your query here.
-'base' will look at the same level of the base DN, 'one' will look at one
-level below the base DN, 'sub' will search the whole subtree.
+.P
+'base' will look at the same level of the base DN, 'one' will look at one level below the base DN, 'sub' will search the whole subtree.
+.P
 Possible values: base, one, sub
+.P
 Default: base
 
 .SS [query] deref
-With this option you can tell your query, whether to dereference aliases or
-not. Use 'never' to never follow references, 'search' to follow during
-search operations, 'find' to follow only at finding and 'always' to always
-follow. Remember to match your filter!
+With this option you can tell your query, whether to dereference aliases or not.
+.P
+Use 'never' to never follow references, 'search' to follow during search operations, 'find' to follow only at finding and 'always' to always follow. Remember to match your filter!
+.P
 Possible values: never, search, find, always
+.P
 Default: never
 
 .SS [query] attrs
-This option lets you define, which attributes to return from in your LDAP
-query. Set at least your user part attribute (e.g. 'uid', see
-[result] attr_local) and, if memberOf domain resolution is used, the
-'memberOf' attribute.
+This option lets you define, which attributes to return from in your LDAP query.
+.P
+Set at least your user part attribute (e.g. 'uid', see [result] attr_local) and, if memberOf domain resolution is used, the 'memberOf' attribute.
+.P
 Example: attrs = 'uid', 'memberOf'
+.P
 If no attributes are set, the standard set is returned.
+.P
 Default: none
 
 .SS [result] attr_local
 Name your LDAP attribute here, which holds your e-mail user part.
-For a dn like 'uid=user,ou=users,dc=example,dc=com' you would like to use
-'uid'
+.P
+For a dn like 'uid=user,ou=users,dc=example,dc=com' you would like to use 'uid'
+.P
 Default: uid
 
 .SS [result] attr_domain
-You can define, which LDAP attribute holds the domain part(s) of the
-resolved e-mail address. Don't worry, if example.com is split into
-'dc=example,dc=com'; pellet will manage it for you, if you set the
-attribute to 'dc'.
+You can define, which LDAP attribute holds the domain part(s) of the resolved e-mail address.
+.P
+Don't worry, if example.com is split into 'dc=example,dc=com'; pellet will manage it for you, if you set the attribute to 'dc'.
+.P
 The DN will be searched from left to right for these attributes.
+.P
 Default: dc
 
 .SS [result] domain_by
 Here you can choose, how your domain is resolved.
-You could either set it to 'dn' in order to scan the returned DNs for
-your domain attribute (see [result] attr_domain), to 'memberof', if
-you store domain relationships through groups (remember to get the
-'memberOf' attribute from LDAP, see [query] attrs) or to 'fixed', if
-a single domain should be appended for every user part (see
-[result] domain_fixed).
+.P
+You could either set it to 'dn' in order to scan the returned DNs for your domain attribute (see [result] attr_domain), to 'memberof', if you store domain relationships through groups (remember to get the 'memberOf' attribute from LDAP, see [query] attrs) or to 'fixed', if a single domain should be appended for every user part (see [result] domain_fixed).
+.P
 Possible values: dn, memberof, fixed
+.P
 Default: dn
 
 .SS [result] domain_fixed
-If you set [result] domain_by to the value of 'fixed', you need to
-provide the domain here, which will be appended to all found user
-attributes.
+If you set [result] domain_by to the value of 'fixed', you need to provide the domain here, which will be appended to all found user attributes.
+.P
 This option is mandatory, if domain_by is set to 'fixed'.
+.P
 Default: none
 
 .SS [result] non_dpart
-Here you can configure, how the search for domain attributes handles
-attributes, which don't correspond to [result] attr_domain.
+Here you can configure, how the search for domain attributes handles attributes, which don't correspond to [result] attr_domain.
+.P
 You can either ignore/'skip' these, or break up the search.
+.P
 Example: [result] attr_domain is 'dc' and [result] domain_by is 'dn':
-With a dn like uid=user,dc=mail,dc=net,ou=sub,dc=example,dc=com
-'skip' would return 'user@mail.net.example.com' whereas
-'break' would return 'user@mail.net'.
-If you only have the domain parts on root level, you might just not
-care.
+With a dn like uid=user,dc=mail,dc=net,ou=sub,dc=example,dc=com, 'skip' would return 'user@mail.net.example.com' whereas 'break' would return 'user@mail.net'.
+.P
+If you only have the domain parts on root level, you might just not care.
+.P
 Possible values: break, skip
+.P
 Default: break
 
 .SS [alias] get_aliased
 If you use aliases also for e-mail aliases, this might be of interest.
-Setting this option to 'on' allows you to start an extra query for
-each returned alias in order to retrieve the aliased object.
-Base DN is the DN of the returned alias, scope is 'base' and deref is
-'always' by default for these queries.
+.P
+Setting this option to 'on' allows you to start an extra query for each returned alias in order to retrieve the aliased object.
+.P
+Base DN is the DN of the returned alias, scope is 'base' and deref is 'always' by default for these queries.
+.P
 Possible values: on, off
+.P
 Default: off
 
 .SS [alias] alias_filter
-If you use the alias dereferencing (see [alias] get_aliased), you
-can set your filter for the alias queries here.
-So you might want to search for everybody with uid=%u in the first
-query, but when it comes to alias resolution, you might only want
-back results with an explicit object class. Use this option for
-such a purpose.
+If you use the alias dereferencing (see [alias] get_aliased), you can set your filter for the alias queries here.
+.P
+So you might want to search for everybody with uid=%u in the first query, but when it comes to alias resolution, you might only want back results with an explicit object class.
+.P
+Use this option for such a purpose.
+.P
 Default: (objectClass=*)
 
 .SH OPTIONS
-By default pellet runs on port PELLET_PORT. However, you can of course
-bind it to another port by just changing the lines in postfix' master.cf
-and main.cf files.
-Also you can relocate the script file PELLET_LIB_DIR/pellet.py to any
-other place, just change the corresponding path in postfix' master.cf
+By default pellet runs on port PELLET_PORT. However, you can of course bind it to another port by just changing the lines in postfix' master.cf and main.cf files.
+.P
+Also you can relocate the script file PELLET_LIB_DIR/pellet.py to any other place, just change the corresponding path in postfix' master.cf
 
 .SH SEE ALSO
 .BR postfix (1)
