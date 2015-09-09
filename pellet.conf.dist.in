@@ -52,7 +52,7 @@ base = ou=users,dc=example,dc=com
 
 # Comma-separated list of attributes to be returned from query
 # If none is given, all are returned
-# Example: <'uid', 'memberof'> (without brackets) will return uid and memberof attributes 
+# Example: <'uid', 'memberOf'> (without brackets) will return uid and memberof attributes 
 # Default: none
 #attrs = 
 
