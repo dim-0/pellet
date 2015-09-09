@@ -6,11 +6,11 @@
 #
 # To integrate with postfix add following lines
 # - to master.cf:
-#  127.0.0.1:<port> inet  n       n       n       -       0      spawn
-#    user=<user> argv=/path/to/pellet.py
+#  127.0.0.1:PELLET_PORT inet  n       n       n       -       0      spawn
+#    user=POSTFIX_USER argv=/path/to/pellet.py
 # - to main.cf:
-#  smtpd_sender_login_maps = tcp:[127.0.0.1]:<port>
-#  127.0.0.1:<port>_time_limit = 3600s
+#  smtpd_sender_login_maps = tcp:127.0.0.1:PELLET_PORT
+#  127.0.0.1:PELLET_PORT_time_limit = 3600s
 
 import sys, os, configparser, ldap, re
 
