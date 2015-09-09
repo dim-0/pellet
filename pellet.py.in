@@ -7,7 +7,7 @@
 # To integrate with postfix add following lines
 # - to master.cf:
 #  127.0.0.1:PELLET_PORT inet  n       n       n       -       0      spawn
-#    user=POSTFIX_USER argv=/path/to/pellet.py
+#    user=PELLET_USER argv=PELLET_LIB_DIR/pellet.py
 # - to main.cf:
 #  smtpd_sender_login_maps = tcp:127.0.0.1:PELLET_PORT
 #  127.0.0.1:PELLET_PORT_time_limit = 3600s
@@ -16,7 +16,7 @@ import sys, os, configparser, ldap, re
 
 
 ### Constants
-CONFIG_FILE = 'POSTFIX_ETC_DIR/pellet.conf'
+CONFIG_FILE = 'PELLET_ETC_DIR/pellet.conf'
 MAX_RESP_LEN = 4091 # Max. response length = 4096 - 3 (return code) - 1 (space) - 1 (new line)
 
 RCODES = [200, 400, 500]
