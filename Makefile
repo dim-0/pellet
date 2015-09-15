@@ -18,10 +18,10 @@ MAN3DIR = /usr/share/man/man3
 
 ## users & ports
 # pellet user (who will run the script)
-PELLET_USER = postfix
+PELLET_USER = pellet
 
 # pellet group
-PELLET_GROUP = postfix
+PELLET_GROUP = pellet
 
 # pellet port (where pellet accepts requests)
 PELLET_PORT = 32776
