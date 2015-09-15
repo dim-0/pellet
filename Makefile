@@ -8,7 +8,7 @@ PACKAGE_VERSION = $(lastword $(sort $(subst upstream/,, $(filter upstream/%, $(s
 
 ## paths & directories ##
 # pellet's config directory (where pellet.conf, main.cf and master.cf reside)
-PELLET_ETC_DIR = /etc/postfix
+PELLET_ETC_DIR = /etc/pellet
 
 # lib directory (where the script will go)
 PELLET_LIB_DIR = /usr/lib/postfix
