@@ -225,9 +225,13 @@ def read_config():
 	global config
 
 	config = configparser.ConfigParser(interpolation=None)
-	config.read_file(open(CONFIG_FILE))
-	check_mandatory_options()
-	check_valid_options()
+	try:
+		config.read_file(open(CONFIG_FILE))
+	except:
+		raise Exception('Cannot read config file ' + CONFIG_FILE)
+	else:
+		check_mandatory_options()
+		check_valid_options()
 
 # Initialization
 def initialize():
@@ -237,10 +241,10 @@ def initialize():
 
 
 ### Execution
-initialize()
+try:
+	initialize()
 
-while True:
-	try:
+	while True:
 		sender = parse(raw_input())
 
 		if not re.match(r'[^@]+@[^@]+\.[^@]+', sender):
@@ -252,11 +256,11 @@ while True:
 				output(200, format_result(result))
 			else:
 				output(500, 'Could not match address ' + sender)
-	except Exception as exc:
-		args = exc.args
-		for arg in args:
-			if not msg:
-				msg = str(arg)
-			else:
-				msg = msg + '; ' + str(arg)
-		print('400 Error: ' + msg)
+except Exception as exc:
+	args = exc.args
+	for arg in args:
+		if not msg:
+			msg = str(arg)
+		else:
+			msg = msg + '; ' + str(arg)
+	print('400 Error: ' + msg)
