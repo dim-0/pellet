@@ -258,6 +258,7 @@ try:
 				output(500, 'Could not match address ' + sender)
 except Exception as exc:
 	args = exc.args
+	msg = ''
 	for arg in args:
 		if not msg:
 			msg = str(arg)
